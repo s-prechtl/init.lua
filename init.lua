@@ -2,6 +2,7 @@
 -- See `:help mapleader`
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
+vim.opt.guicursor = ''
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
