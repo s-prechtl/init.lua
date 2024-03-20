@@ -626,6 +626,7 @@ require('lazy').setup {
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     config = function()
+      vim.opt.runtimepath:append("$HOME/.local/share/treesitter")
       -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
 
       ---@diagnostic disable-next-line: missing-fields
