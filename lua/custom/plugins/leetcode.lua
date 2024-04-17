@@ -9,6 +9,6 @@ return {
         "rcarriga/nvim-notify",
     },
     opts = {
-        lang="go"
+        lang="Go"
     },
 }
