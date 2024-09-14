@@ -388,7 +388,7 @@ require('lazy').setup {
         pylsp = {},
         rust_analyzer = {},
         volar = {},
-        tsserver = {
+        ts_ls = {
           init_options = {
             plugins = {
               {
