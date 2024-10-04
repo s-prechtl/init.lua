@@ -140,7 +140,7 @@ require('lazy').setup {
   --    require('Comment').setup({})
 
   -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim',    opts = {} },
+  { 'numToStr/Comment.nvim',  opts = {} },
 
   -- Here is a more advanced example where we pass configuration
   -- options to `gitsigns.nvim`. This is equivalent to the following lua:
@@ -375,6 +375,7 @@ require('lazy').setup {
       --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+      local lspconfig = require("lspconfig")
 
       -- Enable the following language servers
       --  - cmd (table): Override the default command used to start the server
@@ -383,7 +384,11 @@ require('lazy').setup {
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        clangd = {},
+        clangd = {
+          manual_install = true,
+          filetypes = { 'c', 'cpp' },
+          root_dir = lspconfig.util.root_pattern("src"),
+        },
         gopls = {},
         pylsp = {},
         rust_analyzer = {},
@@ -404,14 +409,6 @@ require('lazy').setup {
             'vue',
           },
         },
-        -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
-        --
-        -- Some languages (like typescript) have entire language plugins that can be useful:
-        --    https://github.com/pmizio/typescript-tools.nvim
-        --
-        -- But for many setups, the LSP (`tsserver`) will work just fine
-        --
-
         lua_ls = {
           -- cmd = {...},
           -- filetypes { ...},
@@ -446,15 +443,35 @@ require('lazy').setup {
       --    :Mason
       --
       --  You can press `g?` for help in this menu
-      require('mason').setup()
+      local servers_to_install = vim.tbl_filter(function(key)
+        local t = servers[key]
+        if type(t) == "table" then
+          return not t.manual_install
+        else
+          return t
+        end
+      end, vim.tbl_keys(servers))
 
-      -- You can add other tools here that you want Mason to install
-      -- for you, so that they are available from within Neovim.
-      local ensure_installed = vim.tbl_keys(servers or {})
-      vim.list_extend(ensure_installed, {
-        'stylua', -- Used to format lua code
-      })
-      require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+      require("mason").setup()
+
+      local ensure_installed = {
+        "lua_ls",
+        -- "tailwind-language-server",
+      }
+
+      vim.list_extend(ensure_installed, servers_to_install)
+      require("mason-tool-installer").setup { ensure_installed = ensure_installed }
+
+      for name, config in pairs(servers) do
+        if config == true then
+          config = {}
+        end
+        config = vim.tbl_deep_extend("force", {}, {
+          capabilities = capabilities,
+        }, config)
+
+        lspconfig[name].setup(config)
+      end
 
       require('mason-lspconfig').setup {
         handlers = {
