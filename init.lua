@@ -388,9 +388,24 @@ require('lazy').setup {
           manual_install = true,
           filetypes = { 'c', 'cpp' },
           root_dir = lspconfig.util.root_pattern("src"),
+          cmd = {
+            "clangd",
+            "--pch-storage=memory",
+            "--completion-style=detailed",
+            "--header-insertion=never",
+            "--background-index",
+            "--all-scopes-completion",
+            "--header-insertion-decorators",
+            "--function-arg-placeholders",
+            "--inlay-hints",
+            "--pretty",
+            -- TODO: remove or adjust
+            -- "-j=4",
+          },
         },
         gopls = {},
-        pylsp = {},
+        pylsp = {
+        },
         rust_analyzer = {},
         volar = {},
         ts_ls = {
