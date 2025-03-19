@@ -134,6 +134,17 @@ vim.opt.rtp:prepend(lazypath)
 --
 require('lazy').setup {
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
+  {
+    "mfussenegger/nvim-jdtls",
+    ft = { "java" }, -- Load only for Java files
+    config = function()
+      local config = {
+        cmd = { "jdtls" },
+        root_dir = vim.fs.dirname(vim.fs.find({ "gradlew", ".git", "mvnw" }, { upward = true })[1]),
+      }
+      require("jdtls").start_or_attach(config)
+    end,
+  },
   -- Use `opts = {}` to force a plugin to be loaded.
   --
   --  This is equivalent to:
@@ -392,7 +403,6 @@ require('lazy').setup {
             "clangd",
             "--pch-storage=memory",
             "--completion-style=detailed",
-            "--header-insertion=never",
             "--background-index",
             "--all-scopes-completion",
             "--header-insertion-decorators",
